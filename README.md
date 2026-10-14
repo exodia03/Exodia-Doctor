@@ -1,4 +1,4 @@
-# 🩺 Exodia Doctor
+# 🩺 Exodia OS Doctor
 
 ### Arch Linux Diagnostics & Pacman Troubleshooting
 
