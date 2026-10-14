@@ -1,277 +1,211 @@
-🩺 Exodia Doctor
-Arch Linux Diagnostics & Pacman Troubleshooting
+# 🩺 Exodia Doctor
 
-![Platform](https://img.shields.io/badge/platform-Arch%20Linux-1793D1?logo=arch-linux&logoColor=white) ![Language](https://img.shields.io/badge/language-Bash-4EAA25?logo=gnubash&logoColor=white) ![License](https://img.shields.io/badge/license-Choose%20a%20license-lightgrey)
+### Arch Linux Diagnostics & Pacman Troubleshooting
 
-Exodia Doctor is a lightweight Bash utility designed to diagnose common Arch Linux and Exodia OS package-management issues. It collects system information, inspects Pacman configuration, checks package signatures and keyrings, examines recent package errors, and investigates NVIDIA firmware file ownership.
+[![Platform](https://img.shields.io/badge/platform-Arch%20Linux-1793D1?logo=arch-linux&logoColor=white)](https://archlinux.org/)
+[![Language](https://img.shields.io/badge/language-Bash-4EAA25?logo=gnubash&logoColor=white)](https://www.gnu.org/software/bash/)
+[![GitHub](https://img.shields.io/badge/GitHub-Exodia--Doctor-181717?logo=github)](https://github.com/exodia03/Exodia-Doctor)
 
-Whether you're troubleshooting a failed system upgrade, a PGP signature error, or a firmware conflict after updating your system, Exodia Doctor helps you gather the information needed to identify the problem safely.
+**Exodia Doctor** is a lightweight Bash utility for diagnosing common Arch Linux and Exodia OS package-management issues. It helps investigate Pacman signature errors, keyring problems, failed upgrades, package-file conflicts, and NVIDIA firmware ownership issues.
 
-[!IMPORTANT]
-Exodia Doctor prioritizes diagnosis over automatic repair. Diagnostic mode does not install, remove, or overwrite packages. Upgrade mode runs pacman -Syu only after explicit confirmation. It does not disable signature verification or automatically trust signing keys.
-📑 Table of Contents
-Features
-Use Cases
-Requirements
-Installation
-Usage
-Diagnostic Checks
-NVIDIA Firmware Troubleshooting
-Log Files
-Troubleshooting Guide
-Safety and Limitations
-Roadmap
-Contributing
-License
-✨ Features
-Feature	Description
-🖥️ System information	Reports distribution details, kernel version, date, and Pacman version.
-🌐 Network diagnostics	Checks basic IP connectivity and DNS/network access.
-🕒 Clock diagnostics	Displays system time and synchronization information.
-🔐 Signature configuration	Inspects Pacman signature settings and repository configuration.
-🔑 Keyring checks	Reports installed Arch Linux and Chaotic-AUR keyring packages.
-📦 Package ownership	Identifies packages owning selected NVIDIA firmware directories.
-🧾 Error analysis	Searches the Pacman log for signature, keyring, and file-conflict errors.
-📝 Diagnostic reports	Saves terminal output to timestamped log files.
-⬆️ Optional system upgrade	Offers an interactive full system upgrade with pacman -Syu.
-🛡️ Safety-first behavior	Avoids automatic key trust changes, forced overwrites, and package removals.
-🎯 Use Cases
+> [!IMPORTANT]
+> Exodia Doctor prioritizes diagnosis over automatic repair. Review the findings before modifying your system.
 
-Exodia Doctor is useful when:
+---
 
-A system upgrade fails because of package-file conflicts.
-Pacman reports unknown trust or PGP signature errors.
-A keyring appears outdated or a signing key cannot be retrieved.
-NVIDIA firmware directories are involved in a package conflict.
-You want to inspect recent package-manager errors after a system update.
-You need a diagnostic report to share when asking for technical support.
-🧰 Requirements
-Arch Linux, Exodia OS, or a compatible Arch-based distribution.
-Bash.
-Pacman.
-sudo for the optional system upgrade.
-Standard system utilities such as grep, tee, date, and uname.
+## 📑 Table of Contents
 
-The script uses ping when available. A failed ping does not necessarily mean that the internet is unavailable, since some networks block ICMP traffic.
+- [Features](#-features)
+- [Requirements](#-requirements)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Diagnostic Checks](#-diagnostic-checks)
+- [NVIDIA Firmware Troubleshooting](#-nvidia-firmware-troubleshooting)
+- [Logs](#-logs)
+- [Troubleshooting](#-troubleshooting)
+- [Safety](#-safety)
+- [Roadmap](#-roadmap)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-📥 Installation
-Option 1: Clone the repository
+---
+
+## ✨ Features
+
+- 🖥️ **System information** — Collects operating system, kernel, and Pacman details.
+- 🌐 **Network diagnostics** — Helps investigate connectivity and DNS issues.
+- 🕒 **Clock checks** — Displays system time and synchronization information.
+- 🔐 **Pacman configuration** — Inspects repository and signature settings.
+- 🔑 **Keyring diagnostics** — Checks installed Arch Linux and Chaotic-AUR keyring packages.
+- 📦 **Package ownership checks** — Identifies packages owning selected NVIDIA firmware directories.
+- 🧾 **Error analysis** — Searches Pacman's logs for common signature, keyring, and file-conflict errors.
+- 📝 **Diagnostic reports** — Saves reports to a dedicated log directory.
+- ⬆️ **Optional system upgrade** — Offers an interactive full system upgrade after confirmation.
+
+## 🧰 Requirements
+
+- Arch Linux, Exodia OS, or a compatible Arch-based distribution.
+- Bash and Pacman.
+- `sudo` for system upgrades.
+- Standard utilities such as `grep`, `tee`, `date`, and `uname`.
+
+---
+
+## 📥 Installation
+
+### Clone the repository
+
+```bash
 git clone https://github.com/exodia03/Exodia-Doctor.git
 cd Exodia-Doctor
 chmod +x exodia-doctor.sh
-
-Option 2: Download the script
+Download the script directly
+bash
 curl -fLO https://raw.githubusercontent.com/exodia03/Exodia-Doctor/main/exodia-doctor.sh
 chmod +x exodia-doctor.sh
-
-
-Review the script before executing it, especially when downloading code directly from the internet.
-
+Tip: Review downloaded scripts before executing them.
 🚀 Usage
 1. Run diagnostics
-
-The recommended starting point is diagnostic mode:
-
+bash
 ./exodia-doctor.sh
-
-
-This collects system information and writes a report without initiating a package upgrade.
-
-2. Review the diagnostic report
-
-The script stores its reports in:
-
-~/pacman-doctor-logs/
-
-
-List available reports:
-
-ls -lt ~/pacman-doctor-logs/
-
-
-Read the latest diagnostic report:
-
-less "$(ls -t ~/pacman-doctor-logs/diagnostic-*.log | head -n 1)"
-
-3. Run an optional system upgrade
-
-After reviewing the report, you can request an interactive full system upgrade:
-
+Start with diagnostic mode to inspect your system and collect relevant information.
+2. Run an optional system upgrade
+bash
 ./exodia-doctor.sh --upgrade
-
-
-The script asks for confirmation before running:
-
+After confirmation, upgrade mode runs:
+bash
 sudo pacman -Syu
-
-
-Review package replacement and removal prompts carefully. If Pacman reports an error, save the upgrade log and investigate the specific cause before attempting a repair.
-
-[!WARNING]
-The --upgrade option performs a real system upgrade. It is not a repair-only operation. It does not automatically resolve every signature, keyring, or package-file conflict.
+This performs a full system upgrade; it is not a repair-only operation.
+3. View diagnostic logs
+List the latest reports:
+bash
+ls -lt ~/pacman-doctor-logs/
+Read the latest diagnostic report:
+bash
+less "$(ls -t ~/pacman-doctor-logs/diagnostic-*.log | head -n 1)"
+The exact log filenames depend on the script's implementation.
 🔍 Diagnostic Checks
-System information
-
-Collects:
-
-Distribution information from /etc/os-release.
-The running kernel version.
-Current date and time.
-Installed Pacman version.
-Network and clock
-
-Checks basic connectivity and displays clock synchronization status. These checks help identify possible DNS, network, or incorrect-system-time issues that can interfere with package downloads and signature verification.
-
-Pacman configuration and keyrings
-
-Inspects Pacman signature configuration and repository settings, and checks whether the following packages are installed:
-
-archlinux-keyring
-chaotic-keyring
-
-The script reports their status; it does not automatically update or reinstall them.
-
-Recent Pacman errors
-
-Searches /var/log/pacman.log for relevant messages, including:
-
-Unknown signing-key trust.
-PGP signature failures.
-Invalid or corrupted packages.
-Conflicting files.
-Failed transactions.
-Keyring errors.
-
-The output is intended to help you locate the underlying issue rather than apply an indiscriminate fix.
-
+Check	
+Purpose
+System information	
+Identify the operating system, kernel, and Pacman version.
+Network connectivity	
+Investigate possible network and DNS problems.
+System clock	
+Check for time-related signature verification issues.
+Signature configuration	
+Inspect Pacman repository and signature settings.
+Keyring packages	
+Check whether relevant keyring packages are installed.
+Package ownership	
+Identify which package owns a conflicting path.
+Pacman logs	
+Locate recent errors and failed transactions.
 🟢 NVIDIA Firmware Troubleshooting
-
-One of the main use cases for Exodia Doctor is investigating NVIDIA firmware package conflicts after a system upgrade.
-
-For example, a system might report that the following directories are owned by linux-firmware:
-
+NVIDIA firmware ownership conflicts can occur during package upgrades or package transitions. Exodia Doctor helps investigate these issues without blindly overwriting files.
+For example, the following directories may be involved:
+text
 /usr/lib/firmware/nvidia/ad103/
 /usr/lib/firmware/nvidia/ad104/
 /usr/lib/firmware/nvidia/ad106/
 /usr/lib/firmware/nvidia/ad107/
-
-
-These directories are associated with NVIDIA GPU firmware.
-
-Step 1: Check installed packages
+Step 1: Check installed firmware and NVIDIA packages
+bash
 pacman -Q | grep -E '^(linux-firmware|nvidia)'
-
-
-This displays installed packages whose names begin with linux-firmware or nvidia.
-
-Step 2: Identify firmware ownership
+Step 2: Check package ownership
+bash
 pacman -Qo /usr/lib/firmware/nvidia/ad103
 pacman -Qo /usr/lib/firmware/nvidia/ad104
 pacman -Qo /usr/lib/firmware/nvidia/ad106
 pacman -Qo /usr/lib/firmware/nvidia/ad107
-
-
-Pacman reports which installed package owns each path.
-
-Step 3: Inspect package conflicts
-
-If an upgrade reports that one package cannot install files because another package already owns them, record the exact conflicting paths and package names.
-
-Check the distribution's package-transition instructions and determine whether a package replacement or ownership transition is expected.
-
-Step 4: Resolve the underlying issue
-
-Use the actual error message to select the appropriate repair.
-
-Package transition: Follow the relevant distribution or repository instructions.
-Unexpected file ownership: Verify which package should own the conflicting path.
-Outdated firmware package: Check available package updates and dependency requirements.
-Repository or signature error: Resolve the signing-key, repository, or package-integrity problem first.
-[!CAUTION]
-Do not blindly use pacman --overwrite, pacman -Rdd, or manually delete firmware directories. These actions can bypass package safeguards or break dependencies. Use them only when the exact conflict is understood and a documented repair requires them.
-
-Important: A directory being owned by linux-firmware is not, by itself, evidence of a problem. The conflict message and package metadata determine whether intervention is necessary.
-
-🗂️ Log Files
-
-Exodia Doctor creates timestamped diagnostic and upgrade reports under:
-
+Example output:
+text
+/usr/lib/firmware/nvidia/ad103/ is owned by linux-firmware 20240220.97b693d2-1
+This confirms that the installed linux-firmware package owns the directory. Ownership alone does not indicate a problem.
+Step 3: Investigate conflicting files
+If Pacman reports a file conflict during an upgrade:
+Record the complete error message.
+Identify the package that currently owns each conflicting path.
+Check installed package versions and repository configuration.
+Consult the relevant Arch Linux or distribution-specific package-transition instructions.
+Retry the upgrade only after understanding the conflict.
+Step 4: Avoid unsafe workarounds
+Do not blindly run commands such as:
+bash
+sudo pacman -Rdd package-name
+sudo pacman --overwrite '*' -Syu
+These commands can bypass dependency or file-conflict safeguards. Manually deleting firmware files can also damage a package installation.
+Recommended approach: Diagnose the actual conflict and use a targeted, documented repair rather than forcing the upgrade.
+Note: A directory being owned by linux-firmware is not, by itself, evidence of a problem. The actual conflict message and package metadata determine whether intervention is necessary.
+🗂️ Logs
+Diagnostic reports are stored in:
+text
 ~/pacman-doctor-logs/
-
-
-Example layout:
-
-~/pacman-doctor-logs/
-├── diagnostic-YYYYMMDD-HHMMSS.log
-└── upgrade-YYYYMMDD-HHMMSS.log
-
-
-The actual filenames contain timestamps. An upgrade log is created for each upgrade-mode invocation.
-
-View recent errors
+Inspect recent Pacman errors directly:
+bash
 grep -Ei \
   'unknown trust|PGP signature|invalid or corrupted package|conflicting files|failed to commit transaction|keyring' \
   /var/log/pacman.log | tail -n 60
-
-Share a diagnostic report
-
-When requesting help, share the relevant error message and diagnostic output. Review reports before publishing them because they may contain usernames, repository configuration, installed package information, and other system details.
-
-🛠️ Troubleshooting Guide
-Symptom	Recommended next step
-unknown trust	Verify the package signature, repository, system clock, and appropriate keyring repair procedure.
-PGP signature failure	Check package integrity and signing-key information. Do not disable signature verification.
-Unknown host	Investigate DNS resolution, network connectivity, and keyserver or repository access.
-conflicting files	Run pacman -Qo /path/to/file for each reported path and identify the ownership transition.
-Failed package transaction	Inspect the complete error in the upgrade log before retrying.
-NVIDIA firmware conflict	Check the conflicting paths, installed firmware packages, and distribution-specific migration instructions.
-Ping fails	Verify connectivity using other methods; ICMP may be blocked.
-🔒 Safety and Limitations
-
-Exodia Doctor is a diagnostic and guided-maintenance script, not a universal package repair tool.
-
-Diagnostic mode does not intentionally change installed packages.
-Upgrade mode requires confirmation before running a full system upgrade.
-The script does not automatically disable Pacman signature checks.
+Before sharing logs publicly, review them for usernames, repository information, and other potentially sensitive details.
+🛠️ Troubleshooting
+Error	
+Recommended action
+unknown trust	
+Investigate the signing key, keyring, system clock, and repository configuration.
+PGP signature failure	
+Verify package integrity and signing-key information.
+Unknown host	
+Check DNS resolution and network connectivity.
+conflicting files	
+Use pacman -Qo to identify file ownership.
+Failed transaction	
+Review the complete Pacman error and log.
+NVIDIA firmware conflict	
+Inspect conflicting paths and package-transition instructions.
+Ping failure	
+Check connectivity using other methods because ICMP may be blocked.
+🔒 Safety
+Exodia Doctor is a diagnostic and guided-maintenance tool, not an automatic solution for every package-management issue.
+Diagnostic mode is intended to inspect the system without changing installed packages.
+Upgrade mode requests confirmation before initiating a full system upgrade.
+The script does not automatically disable signature verification.
 It does not automatically trust arbitrary signing keys.
 It does not automatically remove packages or force file overwrites.
-It inspects selected NVIDIA firmware directories rather than every possible GPU firmware path.
-It relies on available system tools and the contents of the local Pacman log.
-Its error matching is intentionally limited and may not detect every possible failure.
-
-Always maintain a working backup and ensure that you have a recovery method before performing significant package-management operations.
-
+Some errors require manual investigation or distribution-specific instructions.
+Always maintain backups and ensure you have a recovery method before performing significant system maintenance.
 🗺️ Roadmap
-
-Potential future improvements include:
+Potential future improvements:
 
 Interactive diagnostic menu.
-NVIDIA GPU detection using PCI device information.
-Expanded firmware ownership and package-integrity checks.
-Improved detection of incomplete upgrades.
+
+Automatic NVIDIA GPU detection.
+
+Expanded firmware ownership checks.
+
+Detection of incomplete or interrupted upgrades.
+
 Distribution-aware repair recommendations.
-Optional JSON diagnostic reports.
-Automated tests and ShellCheck integration.
-More detailed diagnostic summaries with severity levels.
-Separate, explicitly confirmed repair commands for supported failure scenarios.
 
-These are planned improvements, not claims about features currently implemented.
+JSON diagnostic reports.
 
+ShellCheck integration and automated tests.
+
+Clearer error severity indicators.
+
+Optional, explicitly confirmed repair actions.
+These items are proposed improvements, not necessarily implemented features.
 🤝 Contributing
-
-Contributions, bug reports, and suggestions are welcome.
-
+Contributions and suggestions are welcome!
 Fork the repository.
 Create a feature branch.
-Test your changes on an Arch-based system.
-Verify shell syntax with bash -n exodia-doctor.sh.
-Run ShellCheck if available.
-Open a pull request describing the change and its testing.
-
-Please include the relevant Pacman error messages when reporting package-management bugs, and redact any sensitive information.
-
+Make your changes.
+Validate shell syntax:
+bash
+bash -n exodia-doctor.sh
+Run ShellCheck if available:
+bash
+shellcheck exodia-doctor.sh
+Submit a pull request describing your changes and tests.
+Please include relevant Pacman error messages when reporting package-management bugs, and redact sensitive information.
 📄 License
-
-No license is specified by this README. Before redistributing or modifying the project, check the repository for an existing LICENSE file or add an appropriate open-source license.
-
-<p align="center"> <strong>Exodia Doctor</strong><br> Diagnose first. Understand the problem. Repair safely. </p>
+Check the repository for an existing LICENSE file. If no license exists, add an appropriate open-source license before advertising the project as open source.
